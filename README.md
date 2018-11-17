@@ -17,3 +17,11 @@ Additionally, to run the auto-formatter, use autopep8:
 ```
 autopep8 --in-place --aggressive --aggressive <filename>
 ```
+
+## Running
+
+To run, use train.py form the root directory. Logs should be printed to train.log.
+
+```
+python train.py
+```
