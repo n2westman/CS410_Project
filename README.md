@@ -1,2 +1,19 @@
 # CS410_Project
 Semi-Supervised NLP
+
+
+## Setup
+
+You'll find data/ in the data subdirectory, and all source in the source/ subdirectory.
+
+To install required python package, use pip:
+
+```
+pip install -r requirements.txt
+```
+
+Additionally, to run the auto-formatter, use autopep8:
+
+```
+autopep8 --in-place --aggressive --aggressive <filename>
+```
