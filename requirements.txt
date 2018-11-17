@@ -1,1 +1,5 @@
 autopep8
+torch
+torchtext
+torchvision
+tqdm
