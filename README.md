@@ -1,6 +1,9 @@
 # CS410_Project
 Semi-Supervised NLP
 
+## Overview
+
+This project will look at using new semi-supervised learning techniques to perform tasks such as Named Entity Recognition (NER) on datasets. We use the CONLL 2003 dataset here.
 
 ## Setup
 
