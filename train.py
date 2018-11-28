@@ -18,8 +18,9 @@ def print_samples(n, dataset):
 
     for i, batch in enumerate(train_iter):
         sentences = [' '.join(l) for l in lib.utils.indices2words(batch.inputs_word, dataset.vocabs[0], remove_pad=True)]
+        labels = [' '.join(l) for l in lib.utils.indices2words(batch.labels, dataset.vocabs[3], remove_pad=True)]
         for j, sentence in enumerate(sentences):
-            print('Example %d: %s' % (j+1, sentence))
+            print('Example %d: %s\nLabel %d: %s' % (j+1, sentence, j+1, labels[j]))
         break
 
 def main():
