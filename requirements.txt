@@ -4,3 +4,4 @@ torch
 torchtext
 torchvision
 tqdm
+sklearn

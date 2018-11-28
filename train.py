@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from itertools import count
 import os
 import numpy as np
@@ -31,7 +33,17 @@ def main():
 
     wordrepr =  lib.train.build_wordrepr(opt, dataset.vocabs)
 
-    print_samples(10, dataset)
+    train_iter, validation_iter, test_iter = dataset.batch_iter(opt.batch_size)
+    model, optim = lib.train.create_model(opt, wordrepr)
+    trainer = lib.train.Trainer(model, train_iter, validation_iter, optim, opt)
+
+    _, _, _, _, acc, f1, prec, rec = trainer.train(opt.start_epoch, opt.end_epoch)[-1]
+    logger.info('First accuracy: %.3f, f1: %.3f, prec: %.3f, rec: %.3f' % (acc, f1, prec, rec))
+
+    logger.info('Test finished.')
+    logger.info("--- %s seconds ---" % (time.time() - start_time))
+
+    # print_samples(10, dataset)
 
 if __name__ == '__main__':
     main()

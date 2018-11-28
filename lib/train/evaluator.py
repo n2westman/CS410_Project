@@ -15,10 +15,10 @@ class Evaluator(object):
         self.opt = opt
 
     def eval(self, data_iter, pred_file=None):
-        if(isinstance(self.model, lib.model.CRFTagger)):
-            return self.eval_plain(data_iter, pred_file)
-        else:
-            return self.eval_nn(data_iter, pred_file)
+        # if(isinstance(self.model, lib.model.CRFTagger)):
+        #     return self.eval_plain(data_iter, pred_file)
+        # else:
+        return self.eval_nn(data_iter, pred_file)
 
     def eval_plain(self, data_iter, pred_file=None):
         samples, golds = self.model.iter_to_xy(data_iter)

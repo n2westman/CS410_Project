@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from torch.autograd import Variable
 import torch
 import torch.nn as nn
@@ -39,7 +41,7 @@ class CRF(nn.Module):
     def __init__(self, num_tags):
         if num_tags <= 0:
             raise ValueError('invalid number of tags: {}'.format(num_tags))
-        super().__init__()
+        super(CRF, self).__init__()
         self.num_tags = num_tags
         self.start_transitions = nn.Parameter(torch.Tensor(num_tags))
         self.end_transitions = nn.Parameter(torch.Tensor(num_tags))
@@ -57,12 +59,12 @@ class CRF(nn.Module):
         nn.init.uniform_(self.end_transitions, -0.1, 0.1)
         nn.init.uniform_(self.transitions, -0.1, 0.1)
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         return '{}(num_tags={})'.format(self.__class__.__name__, self.num_tags)
 
     def forward(self,
-                emissions: Variable,
-                tags: Variable,
+                emissions,
+                tags,
                 mask = None,
                 reduce = True,
                 ):

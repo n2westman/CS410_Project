@@ -30,7 +30,7 @@ class Trainer(object):
         self.evaluator = lib.train.Evaluator(model, opt)
         self.optim = optim
         self.opt = opt
-        self.plain = isinstance(self.model, lib.model.CRFTagger)
+        self.plain = opt.plainCRF # isinstance(self.model, lib.model.CRFTagger)
 
     def train(self, start_epoch, end_epoch, save_model=None, start_time=None):
         if(self.plain): start_epoch = end_epoch = 0
