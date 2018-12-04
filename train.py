@@ -28,12 +28,17 @@ def print_samples(n, dataset):
 def main():
     logger.info(opt)
 
+    if (opt.st_method == 'VAT'):
+        logger.info('Using Virtual adversarial training with alpha=%s' % (opt.alpha))
+    else:
+        logger.info('Using baseline model.')
+
     dataset = lib.data.Conll_dataset(opt, tag_type='ner', train=True)
-    train_iter, validation_iter, test_iter = dataset.batch_iter(opt.batch_size)
+    train_iter, validation_iter, test_iter, unlabeled_iter = dataset.batch_iter(opt.batch_size)
 
     wordrepr = lib.train.build_wordrepr(opt, dataset.vocabs)
     model, optim = lib.train.create_model(opt, wordrepr)
-    trainer = lib.train.Trainer(model, train_iter, validation_iter, optim, opt)
+    trainer = lib.train.Trainer(model, train_iter, validation_iter, optim, opt, unlabeled_iter=unlabeled_iter)
 
     _, _, _, _, acc, f1, prec, rec = trainer.train(opt.start_epoch, opt.end_epoch)[-1]
     logger.info('First accuracy: %.3f, f1: %.3f, prec: %.3f, rec: %.3f' % (acc, f1, prec, rec))

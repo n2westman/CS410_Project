@@ -22,7 +22,7 @@ import logging
 logger = logging.getLogger("train")
 
 class Trainer(object):
-    def __init__(self, model, train_iter, eval_iter, optim, opt):
+    def __init__(self, model, train_iter, eval_iter, optim, opt, unlabeled_iter=None):
 
         self.model = model
         self.train_iter = train_iter
@@ -31,6 +31,8 @@ class Trainer(object):
         self.optim = optim
         self.opt = opt
         self.plain = opt.plainCRF # isinstance(self.model, lib.model.CRFTagger)
+        self.use_unlabeled = unlabeled_iter is not None and self.opt.st_method == "VAT"
+        self.unlabeled_iter = unlabeled_iter
 
         if(self.opt.st_method=="VAT"): self.vat_loss = lib.model.VATLoss()
 
@@ -110,5 +112,35 @@ class Trainer(object):
                       (epoch, (i + 1), nbatches, report_loss, report_accuracy, report_f1, report_prec, report_rec,
                        str(datetime.timedelta(seconds=int(time.time() - self.start_time)))))
                 report_loss = report_accuracy = report_f1 = report_prec = report_rec = 0
+
+        if self.use_unlabeled:
+            logger.info("Using unlabeled examples")
+            nunlabeled_batches = len(self.unlabeled_iter)
+            for i, batch in enumerate(self.unlabeled_iter):
+                self.model.zero_grad()
+                ce_loss, _, _ = self.model(batch)
+
+                if (self.opt.st_method == "VAT"):
+                    lds = self.vat_loss(self.model, batch)
+                    loss = ce_loss + self.opt.alpha * lds
+                else:
+                    loss = ce_loss
+
+                loss.backward()
+                self.optim.step()
+
+                total_loss += loss.item()
+                report_loss += loss.item()
+
+                if (i + 1) % self.opt.log_interval == 0:
+                    logger.info("""Epoch %3d, %6d/%d unlabeled batches; loss:%.2f; %s elapsed""" %
+                          (epoch, (i + 1), nunlabeled_batches, report_loss, str(datetime.timedelta(seconds=int(time.time() - self.start_time)))))
+                    report_loss = 0
+
         if(nbatches==0): return 0, 0, 0, 0, 0
-        return total_loss/float(nbatches), total_accuracy/float(nbatches), total_f1/float(nbatches), total_prec/float(nbatches), total_rec/float(nbatches)
+
+        if self.use_unlabeled:
+            avg_loss = total_loss/float(nbatches+nunlabeled_batches)
+        else:
+            avg_loss = total_loss/float(nbatches)
+        return avg_loss, total_accuracy/float(nbatches), total_f1/float(nbatches), total_prec/float(nbatches), total_rec/float(nbatches)

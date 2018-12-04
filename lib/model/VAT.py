@@ -32,7 +32,7 @@ def _kl_div(log_probs, probs):
 
 class VATLoss(nn.Module):
 
-    def __init__(self, xi=10.0, eps=1.0, ip=1):
+    def __init__(self, xi=10.0, eps=1.0, ip=2):
         """VAT loss
         :param xi: hyperparameter of VAT (default: 10.0)
         :param eps: hyperparameter of VAT (default: 1.0)
