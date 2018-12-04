@@ -29,11 +29,9 @@ def main():
     logger.info(opt)
 
     dataset = lib.data.Conll_dataset(opt, tag_type='ner', train=True)
-    train_iter, validation_iter, test_iter = dataset.batch_iter(batch_size=2)
-
-    wordrepr =  lib.train.build_wordrepr(opt, dataset.vocabs)
-
     train_iter, validation_iter, test_iter = dataset.batch_iter(opt.batch_size)
+
+    wordrepr = lib.train.build_wordrepr(opt, dataset.vocabs)
     model, optim = lib.train.create_model(opt, wordrepr)
     trainer = lib.train.Trainer(model, train_iter, validation_iter, optim, opt)
 

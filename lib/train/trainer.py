@@ -32,8 +32,7 @@ class Trainer(object):
         self.opt = opt
         self.plain = opt.plainCRF # isinstance(self.model, lib.model.CRFTagger)
 
-        if (opt.model_type == "VAT"):
-            self.VATLoss = lib.model.VATLoss()
+        if(self.opt.st_method=="VAT"): self.vat_loss = lib.model.VATLoss()
 
     def train(self, start_epoch, end_epoch, save_model=None, start_time=None):
         if(self.plain): start_epoch = end_epoch = 0
@@ -51,7 +50,7 @@ class Trainer(object):
             logger.info('Train loss: %.3f, accuracy: %.3f, f1: %.3f, prec: %.3f, rec: %.3f' % (loss,  acc, f1, prec, rec))
             save_pred = os.path.join(self.opt.save_dir, "model_%d.txt" % epoch)
             loss, acc, f1, prec, rec = self.evaluator.eval(self.eval_iter, pred_file=save_pred if save_model else None)
-            stats.append([epoch, self.opt.al_method if self.opt.al_method else "-", len(self.train_iter), loss, acc, f1, prec, rec])
+            stats.append([epoch, self.opt.st_method if self.opt.st_method else "-", len(self.train_iter), loss, acc, f1, prec, rec])
             logger.info('Validation loss: %.3f, accuracy: %.3f, f1: %.3f, prec: %.3f, rec: %.3f' % (loss,  acc, f1, prec, rec))
             if not self.plain: self.optim.update_lr(loss, epoch)
             if(save_model):
@@ -80,22 +79,23 @@ class Trainer(object):
         nbatches = len(self.train_iter)
         for i, batch in enumerate(self.train_iter):
             self.model.zero_grad()
-            loss, scores, pred = self.model(batch)
+            ce_loss, scores, pred = self.model(batch)
 
-            if (self.VATLoss):
-                lds = self.VATLoss(self.model, batch)
-                loss = loss + self.opt.alpha * lds
+            if (self.opt.st_method == "VAT"):
+                lds = self.vat_loss(self.model, batch)
+                loss = ce_loss + self.opt.alpha * lds
+            else:
+                loss = ce_loss
 
             loss.backward()
-            loss = loss.item()
             self.optim.step()
 
             y_true = lib.utils.indices2words(batch.labels.data.tolist(), self.model.wordrepr.tag_vocab)
             pred = lib.utils.indices2words(pred, self.model.wordrepr.tag_vocab)
 
             accuracy, f1, prec, rec = lib.utils.eval_ner(y_true, pred)
-            total_loss += loss
-            report_loss += loss
+            total_loss += loss.item()
+            report_loss += loss.item()
             total_accuracy += accuracy
             report_accuracy += accuracy
             total_f1 += f1

@@ -22,8 +22,6 @@ parser.add_argument("-convert_digits", action='store_true', default=True, help='
 
 ## Model
 parser.add_argument('-plainCRF', action='store_true', default=False,help='Use plain CRF, if so, all other model arguments not used')
-parser.add_argument("-model_type", type=str, default="", help="ex: VAT")
-parser.add_argument("-alpha", type=float, default=0.2, help="Used in VAT")
 parser.add_argument('-brnn', action='store_true', default=True,help='Make RNNs bidirectional')
 parser.add_argument("-dropout", type=float, default=0.2)
 parser.add_argument("-hidden_dim", type=int, default=100)
@@ -58,7 +56,8 @@ parser.add_argument('-save_dir', type=str, default='exps', help='Path to a check
 
 ## Active Learning
 parser.add_argument('-al_method', type=str, default='us', help='[us|rs|bald|nb|ds]')
-parser.add_argument('-st_method', type=str, default='st', help='[us|rs|bald|st|ds]')
+parser.add_argument('-st_method', type=str, default='VAT', help='VAT')
+parser.add_argument("-alpha", type=float, default=0.2, help="Used in VAT")
 parser.add_argument('-nsamples', type=int, default=100, help='number of samples in batch for heuristics AL')
 parser.add_argument('-labeled', type=int, default=100, help='Number of initial labeled examples')
 parser.add_argument('-k_num', type=int, default=100, help="number of unlabeled examples to initially sample")
