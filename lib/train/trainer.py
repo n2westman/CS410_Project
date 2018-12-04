@@ -32,6 +32,9 @@ class Trainer(object):
         self.opt = opt
         self.plain = opt.plainCRF # isinstance(self.model, lib.model.CRFTagger)
 
+        if (opt.model_type == "VAT"):
+            self.VATLoss = lib.model.VATLoss()
+
     def train(self, start_epoch, end_epoch, save_model=None, start_time=None):
         if(self.plain): start_epoch = end_epoch = 0
         self.start_time = time.time() if start_time is None else start_time
@@ -78,6 +81,11 @@ class Trainer(object):
         for i, batch in enumerate(self.train_iter):
             self.model.zero_grad()
             loss, scores, pred = self.model(batch)
+
+            if (self.VATLoss):
+                lds = self.VATLoss(self.model, batch)
+                loss = loss + self.opt.alpha * lds
+
             loss.backward()
             loss = loss.item()
             self.optim.step()

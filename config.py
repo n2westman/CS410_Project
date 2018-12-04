@@ -22,6 +22,8 @@ parser.add_argument("-convert_digits", action='store_true', default=True, help='
 
 ## Model
 parser.add_argument('-plainCRF', action='store_true', default=False,help='Use plain CRF, if so, all other model arguments not used')
+parser.add_argument("-model_type", type=str, default="", help="ex: VAT")
+parser.add_argument("-alpha", type=float, default=0.2, help="Used in VAT")
 parser.add_argument('-brnn', action='store_true', default=True,help='Make RNNs bidirectional')
 parser.add_argument("-dropout", type=float, default=0.2)
 parser.add_argument("-hidden_dim", type=int, default=100)
@@ -87,4 +89,3 @@ def additional_args(opt):
     if(opt.logfolder):
         opt.save_dir = os.path.join(opt.save_dir, opt.logfolder)
     if opt.save_dir and not os.path.exists(opt.save_dir): os.makedirs(opt.save_dir)
-

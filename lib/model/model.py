@@ -5,6 +5,7 @@
 
 import torch.nn as nn
 from .crf import CRF
+from .VAT import VATLoss
 
 class Model(nn.Module):
     def __init__(self, opt, wordrepr):
@@ -19,16 +20,19 @@ class Model(nn.Module):
 
     def forward(self, batch):
         word_represent = self.wordrepr(batch)
-        hidden = None
-        lstm_out, hidden = self.lstm(word_represent, hidden)
-        feature_out = self.droplstm(lstm_out.transpose(1, 0))
-        outputs = self.hidden2tag(feature_out)
+        outputs = self.predict(word_represent)
         assert outputs.size(2) == len(self.wordrepr.tag_vocab)
         #print('outputs', outputs.size())
         #print('batch.labels', batch.labels.size())
-        llikelihood = - self.crf_tagger.forward(outputs, batch.labels.transpose(1, 0)) if batch.labels is not None else -1
+        loss = - self.crf_tagger.forward(outputs, batch.labels.transpose(1, 0)) if batch.labels is not None else -1
         score, result = self.crf_tagger.decode(outputs)
-        return llikelihood, score, result
+        return loss, score, result
+
+    def predict(self, word_represent):
+        hidden = None
+        lstm_out, hidden = self.lstm(word_represent, hidden)
+        feature_out = self.droplstm(lstm_out.transpose(1, 0))
+        return self.hidden2tag(feature_out)
 
     def get_intermediate_layer(self, layer_index, batch):
         word_represent = self.wordrepr(batch)
