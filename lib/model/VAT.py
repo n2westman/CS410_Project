@@ -23,16 +23,12 @@ def _l2_normalize(d):
     d /= torch.norm(d_reshaped, dim=1, keepdim=True) + 1e-8
     return d
 
-
-def _kl_div(log_probs, probs):
-    # pytorch KLDLoss is averaged over all dim if size_average=True
-    kld = F.kl_div(log_probs, probs, size_average=False)
-    return kld / log_probs.shape[0]
-
+def _loss(pred, pred_hat):
+    return F.mse_loss(F.softmax(pred, dim=2), F.softmax(pred_hat, dim=2))
 
 class VATLoss(nn.Module):
 
-    def __init__(self, xi=10.0, eps=1.0, ip=2):
+    def __init__(self, xi=10.0, eps=1.0, ip=1):
         """VAT loss
         :param xi: hyperparameter of VAT (default: 10.0)
         :param eps: hyperparameter of VAT (default: 1.0)
@@ -47,7 +43,7 @@ class VATLoss(nn.Module):
         x = model.get_intermediate_layer(0, batch)
 
         with torch.no_grad():
-            pred = F.log_softmax(model.predict(x), dim=1)
+            pred = model.predict(x)
 
         # prepare random unit tensor
         d = torch.rand(x.shape).sub(0.5).to(x.device)
@@ -58,7 +54,7 @@ class VATLoss(nn.Module):
             for _ in range(self.ip):
                 d.requires_grad_()
                 pred_hat = model.predict(x + self.xi * d)
-                adv_distance = _kl_div(F.log_softmax(pred_hat, dim=1), pred)
+                adv_distance = _loss(pred, pred_hat)
                 adv_distance.backward(retain_graph=True)
                 d = _l2_normalize(d.grad)
                 model.zero_grad()
@@ -66,6 +62,6 @@ class VATLoss(nn.Module):
             # calc LDS
             r_adv = d * self.eps
             pred_hat = model.predict(x + r_adv)
-            lds = _kl_div(F.log_softmax(pred_hat, dim=1), pred)
+            lds = _loss(pred, pred_hat)
 
         return lds
