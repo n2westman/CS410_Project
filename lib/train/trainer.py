@@ -84,8 +84,9 @@ class Trainer(object):
         return lds / (self.opt.n_ubatches + 1.)
 
     def update_ema_parameters(self):
+        alpha = 0.99
         for ema_param, param in zip(self.ema_model.parameters(), self.model.parameters()):
-            ema_param.data = 0.9 * ema_param.clone().data + 0.1 * param.clone().data
+            ema_param.data = alpha * ema_param.clone().data + (1. - alpha) * param.clone().data
 
     def train_epoch(self, epoch):
         self.model.train()
@@ -101,7 +102,8 @@ class Trainer(object):
                 consistency_loss = self.opt.alpha * self.get_lds(batch, unlabeled_batch)
                 loss = ce_loss + consistency_loss
             if (self.opt.st_method == "MT"):
-                consistency_loss = self.mt_loss(self.model, self.ema_model, batch)
+                consistency_loss = self.mt_loss(self.model, self.ema_model, batch, epoch)
+                consistency_loss += self.mt_loss(self.model, self.ema_model, unlabeled_batch, epoch)
                 loss = ce_loss + consistency_loss
             else:
                 consistency_loss = 0.

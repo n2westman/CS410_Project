@@ -92,3 +92,11 @@ IP = 1, Alpha = 1.0
 INFO:train:Train loss: 10.425, accuracy: 0.986, f1: 0.939, prec: 0.943, rec: 0.936
 INFO:train:Validation loss: 28.262, accuracy: 0.968, f1: 0.854, prec: 0.865, rec: 0.842
 INFO:train:First accuracy: 0.968, f1: 0.854, prec: 0.865, rec: 0.842
+
+MT 12/12
+
+7 Epoch, 1000 labels, no unlabeled
+
+INFO:train:Train loss: 26.799, accuracy: 0.953, f1: 0.790, prec: 0.803, rec: 0.780
+INFO:train:Validation loss: 51.292, accuracy: 0.925, f1: 0.630, prec: 0.649, rec: 0.611
+INFO:train:First accuracy: 0.925, f1: 0.630, prec: 0.649, rec: 0.611
