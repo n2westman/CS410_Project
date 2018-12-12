@@ -2,6 +2,7 @@
 #__time__ = 4:09 PM
 #__author__ = isminilourentzou
 
+import itertools
 import datetime
 import os
 import time
@@ -73,19 +74,12 @@ class Trainer(object):
             torch.save(checkpoint, model_name)
         logger.info("Save model as %s" % model_name)
 
-    def get_lds(self, batch):
+    def get_lds(self, batch, unlabeled_batch):
         lds = self.vat_loss(self.model, batch)
-
-        if not self.use_unlabeled:
-            return lds
-
-        count = 2
-        for i, unlabeled_batch in enumerate(self.unlabeled_iter):
-            if i >= count:
-                break
-            lds += self.vat_loss(self.model, unlabeled_batch)
-
-        return lds / (count + 1)
+        lds += self.vat_loss(self.model, unlabeled_batch)
+        # print(batch)
+        # print(unlabeled_batch)
+        return lds / (self.opt.n_ubatches + 1.)
 
     def train_epoch(self, epoch):
         self.model.train()
@@ -93,12 +87,12 @@ class Trainer(object):
         total_prec, total_rec, report_prec, report_rec, total_f1, report_f1 = 0, 0, 0, 0, 0, 0
 
         nbatches = len(self.train_iter)
-        for i, batch in enumerate(self.train_iter):
+        for i, (batch, unlabeled_batch) in enumerate(itertools.izip(self.train_iter, self.unlabeled_iter)):
             self.model.zero_grad()
             ce_loss, scores, pred = self.model(batch)
 
             if (self.opt.st_method == "VAT"):
-                lds = self.opt.alpha * self.get_lds(batch)
+                lds = self.opt.alpha * self.get_lds(batch, unlabeled_batch)
                 loss = ce_loss + lds
             else:
                 lds = 0.
