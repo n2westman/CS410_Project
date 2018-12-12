@@ -73,6 +73,19 @@ class Trainer(object):
             torch.save(checkpoint, model_name)
         logger.info("Save model as %s" % model_name)
 
+    def get_lds(self, batch):
+        lds = self.vat_loss(self.model, batch)
+
+        if not self.use_unlabeled:
+            return lds
+
+        for i, unlabeled_batch in enumerate(self.unlabeled_iter):
+            lds += self.vat_loss(self.model, unlabeled_batch)
+            if i > 1:
+                return lds
+
+        return lds / 3
+
     def train_epoch(self, epoch):
         self.model.train()
         total_loss, total_accuracy, report_loss, report_accuracy = 0, 0, 0, 0
@@ -84,8 +97,7 @@ class Trainer(object):
             ce_loss, scores, pred = self.model(batch)
 
             if (self.opt.st_method == "VAT"):
-                lds = self.vat_loss(self.model, batch)
-                loss = ce_loss + self.opt.alpha * lds
+                loss = ce_loss + self.opt.alpha * self.get_lds(batch)
             else:
                 lds = 0.
                 loss = ce_loss

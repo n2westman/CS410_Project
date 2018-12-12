@@ -49,6 +49,14 @@ INFO:train:Train loss: 7.434, accuracy: 0.988, f1: 0.949, prec: 0.951, rec: 0.94
 INFO:train:Validation loss: 59.172, accuracy: 0.936, f1: 0.688, prec: 0.703, rec: 0.675
 INFO:train:First accuracy: 0.936, f1: 0.688, prec: 0.703, rec: 0.675
 
+Baseline 12/06
+
+5 epoch, all labels
+
+INFO:train:Train loss: 11.762, accuracy: 0.986, f1: 0.941, prec: 0.945, rec: 0.938
+INFO:train:Validation loss: 25.983, accuracy: 0.968, f1: 0.852, prec: 0.853, rec: 0.850
+INFO:train:First accuracy: 0.968, f1: 0.852, prec: 0.853, rec: 0.850
+
 VAT, 12/06
 
 7 epoch, 1000 label, no unlabeled data
@@ -66,3 +74,21 @@ IP = 1, Alpha = 1.0
 INFO:train:Train loss: 9.580, accuracy: 0.991, f1: 0.959, prec: 0.961, rec: 0.957
 INFO:train:Validation loss: 58.895, accuracy: 0.937, f1: 0.692, prec: 0.710, rec: 0.674
 INFO:train:First accuracy: 0.937, f1: 0.692, prec: 0.710, rec: 0.674
+
+VAT, 12/06
+
+1 epoch, All labels
+IP = 1, Alpha = 0.2
+
+INFO:train:Train loss: 40.226, accuracy: 0.937, f1: 0.711, prec: 0.721, rec: 0.706
+INFO:train:Validation loss: 26.973, accuracy: 0.960, f1: 0.813, prec: 0.836, rec: 0.791
+INFO:train:First accuracy: 0.960, f1: 0.813, prec: 0.836, rec: 0.791
+
+VAT 12/06
+
+5 epoch, all labels
+IP = 1, Alpha = 1.0
+
+INFO:train:Train loss: 10.425, accuracy: 0.986, f1: 0.939, prec: 0.943, rec: 0.936
+INFO:train:Validation loss: 28.262, accuracy: 0.968, f1: 0.854, prec: 0.865, rec: 0.842
+INFO:train:First accuracy: 0.968, f1: 0.854, prec: 0.865, rec: 0.842
