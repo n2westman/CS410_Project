@@ -79,12 +79,13 @@ class Trainer(object):
         if not self.use_unlabeled:
             return lds
 
+        count = 2
         for i, unlabeled_batch in enumerate(self.unlabeled_iter):
+            if i >= count:
+                break
             lds += self.vat_loss(self.model, unlabeled_batch)
-            if i > 1:
-                return lds
 
-        return lds / 3
+        return lds / (count + 1)
 
     def train_epoch(self, epoch):
         self.model.train()
