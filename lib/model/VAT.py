@@ -24,7 +24,7 @@ def _l2_normalize(d):
     return d
 
 def _loss(pred, pred_hat):
-    return F.mse_loss(F.softmax(pred, dim=2), F.softmax(pred_hat, dim=2))
+    return F.mse_loss(pred, pred_hat) / pred.shape[0]
 
 class VATLoss(nn.Module):
 

@@ -97,13 +97,14 @@ class Trainer(object):
             ce_loss, scores, pred = self.model(batch)
 
             if (self.opt.st_method == "VAT"):
-                loss = ce_loss + self.opt.alpha * self.get_lds(batch)
+                lds = self.opt.alpha * self.get_lds(batch)
+                loss = ce_loss + lds
             else:
                 lds = 0.
                 loss = ce_loss
 
             # View the ratio of Loss components
-            # logger.info("""CE_LOSS:%.2f, LDS:%.2f""" % (ce_loss, lds))
+            logger.info("""CE_LOSS:%.2f, LDS:%.2f""" % (ce_loss, lds))
 
             loss.backward()
             self.optim.step()
