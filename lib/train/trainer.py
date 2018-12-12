@@ -23,19 +23,21 @@ import logging
 logger = logging.getLogger("train")
 
 class Trainer(object):
-    def __init__(self, model, train_iter, eval_iter, optim, opt, unlabeled_iter=None):
+    def __init__(self, model, train_iter, eval_iter, optim, opt, unlabeled_iter=None, ema_model=None):
 
         self.model = model
+        self.ema_model = ema_model
         self.train_iter = train_iter
         self.eval_iter = eval_iter
         self.evaluator = lib.train.Evaluator(model, opt)
         self.optim = optim
         self.opt = opt
         self.plain = opt.plainCRF # isinstance(self.model, lib.model.CRFTagger)
-        self.use_unlabeled = unlabeled_iter is not None and self.opt.st_method == "VAT"
         self.unlabeled_iter = unlabeled_iter
+        self.updates = 0
 
         if(self.opt.st_method=="VAT"): self.vat_loss = lib.model.VATLoss()
+        if(self.opt.st_method=="MT"): self.mt_loss = lib.model.MeanTeachers(opt)
 
     def train(self, start_epoch, end_epoch, save_model=None, start_time=None):
         if(self.plain): start_epoch = end_epoch = 0
@@ -81,6 +83,10 @@ class Trainer(object):
         # print(unlabeled_batch)
         return lds / (self.opt.n_ubatches + 1.)
 
+    def update_ema_parameters(self):
+        for ema_param, param in zip(self.ema_model.parameters(), self.model.parameters()):
+            ema_param.data = 0.9 * ema_param.clone().data + 0.1 * param.clone().data
+
     def train_epoch(self, epoch):
         self.model.train()
         total_loss, total_accuracy, report_loss, report_accuracy = 0, 0, 0, 0
@@ -92,17 +98,23 @@ class Trainer(object):
             ce_loss, scores, pred = self.model(batch)
 
             if (self.opt.st_method == "VAT"):
-                lds = self.opt.alpha * self.get_lds(batch, unlabeled_batch)
-                loss = ce_loss + lds
+                consistency_loss = self.opt.alpha * self.get_lds(batch, unlabeled_batch)
+                loss = ce_loss + consistency_loss
+            if (self.opt.st_method == "MT"):
+                consistency_loss = self.mt_loss(self.model, self.ema_model, batch)
+                loss = ce_loss + consistency_loss
             else:
-                lds = 0.
+                consistency_loss = 0.
                 loss = ce_loss
 
             # View the ratio of Loss components
-            logger.info("""CE_LOSS:%.2f, LDS:%.2f""" % (ce_loss, lds))
+            logger.info("""CE_LOSS:%.2f, consistency_loss:%.2f""" % (ce_loss, consistency_loss))
 
             loss.backward()
             self.optim.step()
+
+            if (self.opt.st_method == "MT"):
+                self.update_ema_parameters()
 
             y_true = lib.utils.indices2words(batch.labels.data.tolist(), self.model.wordrepr.tag_vocab)
             pred = lib.utils.indices2words(pred, self.model.wordrepr.tag_vocab)

@@ -57,7 +57,7 @@ parser.add_argument('-save_dir', type=str, default='exps', help='Path to a check
 
 ## Active Learning
 parser.add_argument('-al_method', type=str, default='us', help='[us|rs|bald|nb|ds]')
-parser.add_argument('-st_method', type=str, default='VAT', help='VAT')
+parser.add_argument('-st_method', type=str, default='VAT', help='VAT|MT')
 parser.add_argument("-alpha", type=float, default=0.2, help="Used in VAT")
 parser.add_argument('-nsamples', type=int, default=100, help='number of samples in batch for heuristics AL')
 parser.add_argument('-labeled', type=int, default=100, help='Number of initial labeled examples')

@@ -45,9 +45,9 @@ Baseline, 12/04
 
 7 epoch, 1000 label
 
-INFO:train:Train loss: 7.434, accuracy: 0.988, f1: 0.949, prec: 0.951, rec: 0.947
-INFO:train:Validation loss: 59.172, accuracy: 0.936, f1: 0.688, prec: 0.703, rec: 0.675
-INFO:train:First accuracy: 0.936, f1: 0.688, prec: 0.703, rec: 0.675
+INFO:train:Train loss: 25.708, accuracy: 0.955, f1: 0.800, prec: 0.809, rec: 0.793
+INFO:train:Validation loss: 54.083, accuracy: 0.919, f1: 0.606, prec: 0.600, rec: 0.611
+INFO:train:First accuracy: 0.919, f1: 0.606, prec: 0.600, rec: 0.611
 
 Baseline 12/06
 

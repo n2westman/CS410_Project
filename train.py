@@ -38,7 +38,13 @@ def main():
 
     wordrepr = lib.train.build_wordrepr(opt, dataset.vocabs)
     model, optim = lib.train.create_model(opt, wordrepr)
-    trainer = lib.train.Trainer(model, train_iter, validation_iter, optim, opt, unlabeled_iter=unlabeled_iter)
+
+    if opt.st_method == "MT":
+        ema_model, _ = lib.train.create_model(opt, wordrepr, ema=True)
+    else:
+        ema_model = None
+
+    trainer = lib.train.Trainer(model, train_iter, validation_iter, optim, opt, unlabeled_iter=unlabeled_iter, ema_model=ema_model)
 
     _, _, _, _, acc, f1, prec, rec = trainer.train(opt.start_epoch, opt.end_epoch)[-1]
     logger.info('First accuracy: %.3f, f1: %.3f, prec: %.3f, rec: %.3f' % (acc, f1, prec, rec))

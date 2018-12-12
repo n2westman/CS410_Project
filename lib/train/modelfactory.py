@@ -46,13 +46,16 @@ def create_active_learner(opt, wordrepr, network='dqn', load_from=None):
     finish_creation(opt, model)
     return model, optim
 
-def build_model(opt, wordrepr):
+def build_model(opt, wordrepr, ema=False):
     model = lib.model.Model(opt, wordrepr)
     optim = _create_optim(model, opt)
     if opt.cuda: model.cuda()  # GPU.
+    if ema:
+        for p in model.parameters():
+            p.requires_grad = False
     return model, optim
 
-def create_model(opt, wordrepr):
+def create_model(opt, wordrepr, ema=False):
     if(opt.plainCRF):
         if opt.load_from:
             model = lib.model.CRFTagger(opt, wordrepr, model_file=opt.load_from)
@@ -64,10 +67,10 @@ def create_model(opt, wordrepr):
     else:
         if opt.load_from is not None:
             checkpoint = get_checkpoint(opt.load_from, opt)
-            model, optim = build_model(checkpoint['opt'], wordrepr)
+            model, optim = build_model(checkpoint['opt'], wordrepr, ema)
             load_checkpoint(checkpoint, model, optim, opt)
         else:
-            model, optim = build_model(opt, wordrepr)
+            model, optim = build_model(opt, wordrepr, ema)
         finish_creation(opt, model)
     return model, optim
 

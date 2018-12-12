@@ -19,8 +19,7 @@ class Model(nn.Module):
         self.crf_tagger = CRF(wordrepr.outsize)
 
     def forward(self, batch):
-        word_represent = self.wordrepr(batch)
-        outputs = self.predict(word_represent)
+        outputs = self.predict(batch)
         assert outputs.size(2) == len(self.wordrepr.tag_vocab)
         #print('outputs', outputs.size())
         #print('batch.labels', batch.labels.size())
@@ -28,8 +27,10 @@ class Model(nn.Module):
         score, result = self.crf_tagger.decode(outputs)
         return loss, score, result
 
-    def predict(self, word_represent):
+    def predict(self, batch, emb_noise=None):
         hidden = None
+        word_represent = self.wordrepr(batch)
+        if emb_noise is not None: word_represent+=emb_noise
         lstm_out, hidden = self.lstm(word_represent, hidden)
         feature_out = self.droplstm(lstm_out.transpose(1, 0))
         return self.hidden2tag(feature_out)

@@ -40,12 +40,11 @@ class VATLoss(nn.Module):
         self.ip = ip
 
     def forward(self, model, batch):
-        x = model.get_intermediate_layer(0, batch)
-
         with torch.no_grad():
-            pred = model.predict(x)
+            pred = model.predict(batch)
 
         # prepare random unit tensor
+        x = model.get_intermediate_layer(0, batch)
         d = torch.rand(x.shape).sub(0.5).to(x.device)
         d = _l2_normalize(d)
 
@@ -53,7 +52,8 @@ class VATLoss(nn.Module):
             # calc adversarial direction
             for _ in range(self.ip):
                 d.requires_grad_()
-                pred_hat = model.predict(x + self.xi * d)
+                emb_noise = self.xi * d
+                pred_hat = model.predict(batch, emb_noise=emb_noise)
                 adv_distance = _loss(pred, pred_hat)
                 adv_distance.backward(retain_graph=True)
                 d = _l2_normalize(d.grad)
@@ -61,7 +61,7 @@ class VATLoss(nn.Module):
 
             # calc LDS
             r_adv = d * self.eps
-            pred_hat = model.predict(x + r_adv)
+            pred_hat = model.predict(batch, emb_noise=r_adv)
             lds = _loss(pred, pred_hat)
 
         return lds
