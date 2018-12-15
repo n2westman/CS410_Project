@@ -29,6 +29,23 @@ To run, use train.py form the root directory. Logs should be printed to train.lo
 python train.py
 ```
 
+Arguments are listed in config.py, but some important ones include:
+
+*  `-st_method=VAT` which will use the VAT implementation
+*  `-st_method=MT` which will use the Mean Teachers implementation
+*  `-st_method=BASELINE` which will use the baseline implementation
+*  `-labeled=number` which set the number of labeled examples to use. Setting this value to -1 will use all labels available
+*  `-batch_size=number` will set the batch size for training. The higher the number, the faster the training (assuming you have enough memory)
+*  `-n_ubatches=number` the number of unlabeled batches to use at each step for the semi-supervised learning techniques. This will only create a consistency_loss, not a cross-entropy loss. The default is 3, which means 3xbatch_size examples will be used at each step.
+*  `-end_epoch=number` will set the end epoch for model training.
+
+Hyperparameters for VAT:
+
+*  `-alpha=1.` will change alpha, the mutliplier of the consistency_loss, to 2. The default value is 0.2
+
+## Known Issues
+
+Model saving/loading hasn't yet been implemented.
 
 ## Results
 
