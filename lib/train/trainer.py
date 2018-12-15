@@ -101,7 +101,7 @@ class Trainer(object):
             if (self.opt.st_method == "VAT"):
                 consistency_loss = self.opt.alpha * self.get_lds(batch, unlabeled_batch)
                 loss = ce_loss + consistency_loss
-            if (self.opt.st_method == "MT"):
+            elif (self.opt.st_method == "MT"):
                 consistency_loss = self.mt_loss(self.model, self.ema_model, batch, epoch)
                 consistency_loss += self.mt_loss(self.model, self.ema_model, unlabeled_batch, epoch)
                 loss = ce_loss + consistency_loss
