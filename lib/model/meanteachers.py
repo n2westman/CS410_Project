@@ -17,7 +17,7 @@ def _sigmoid_rampup(current, rampup_length):
 
 def _get_current_consistency_weight(epoch):
     # Consistency ramp-up from https://arxiv.org/abs/1610.02242
-    return 100. * _sigmoid_rampup(epoch, 3)
+    return 10. # * _sigmoid_rampup(epoch, 3)
 
 def _loss(pred, pred_hat):
     return F.mse_loss(pred, pred_hat) / pred.shape[0]

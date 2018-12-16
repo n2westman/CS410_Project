@@ -78,11 +78,18 @@ class Trainer(object):
 
     def get_lds(self, batch, unlabeled_batch):
         lds = self.vat_loss(self.model, batch)
-        if unlabeled_batch is not None:
+        if unlabeled_batch is not None and not self.opt.no_unlabeled:
+            print("here")
             lds += self.vat_loss(self.model, unlabeled_batch)
             return lds / (self.opt.n_ubatches + 1.)
         else:
             return lds
+
+    def get_mtloss(self, batch, unlabeled_batch, epoch):
+        consistency_loss = self.mt_loss(self.model, self.ema_model, batch, epoch)
+        if unlabeled_batch is not None and not self.opt.no_unlabeled:
+            consistency_loss += self.mt_loss(self.model, self.ema_model, unlabeled_batch, epoch)
+        return consistency_loss
 
     def update_ema_parameters(self):
         alpha = 0.99
@@ -101,17 +108,12 @@ class Trainer(object):
             self.model.zero_grad()
             ce_loss, scores, pred = self.model(batch)
 
+            consistency_loss = 0.
             if (self.opt.st_method == "VAT"):
-                consistency_loss = self.opt.alpha * self.get_lds(batch, unlabeled_batch)
-                loss = ce_loss + consistency_loss
+                consistency_loss += self.opt.alpha * self.get_lds(batch, unlabeled_batch)
             elif (self.opt.st_method == "MT"):
-                consistency_loss = self.mt_loss(self.model, self.ema_model, batch, epoch)
-                if unlabeled_batch is not None:
-                    consistency_loss += self.mt_loss(self.model, self.ema_model, unlabeled_batch, epoch)
-                loss = ce_loss + consistency_loss
-            else:
-                consistency_loss = 0.
-                loss = ce_loss
+                consistency_loss += self.get_mtloss(batch, unlabeled_batch, epoch)
+            loss = ce_loss + consistency_loss
 
             # View the ratio of Loss components
             logger.info("""CE_LOSS:%.2f, consistency_loss:%.2f""" % (ce_loss, consistency_loss))

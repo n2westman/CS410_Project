@@ -35,6 +35,7 @@ parser.add_argument("-case_emb_dim", type=int, default=20, help='Casing embeddin
 ## Training
 parser.add_argument('-batch_size', type=int, default=16, help='Training batch size')
 parser.add_argument('-n_ubatches', type=int, default=3, help='Training batch size')
+parser.add_argument('-no_unlabeled', action='store_true', default=False, help='Turns off use of unlabeled data')
 parser.add_argument('-adaptive_batch_size', type=int, default=None, help='Adaptive batch size, #instances/#batches where #batches is defined by user')
 parser.add_argument('-start_epoch', type=int, default=1, help='Epoch to start training.')
 parser.add_argument('-end_epoch', type=int, default=1, help='Number of supervised learning epochs')
