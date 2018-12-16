@@ -117,3 +117,21 @@ MT 12/12
 INFO:train:Train loss: 26.799, accuracy: 0.953, f1: 0.790, prec: 0.803, rec: 0.780
 INFO:train:Validation loss: 51.292, accuracy: 0.925, f1: 0.630, prec: 0.649, rec: 0.611
 INFO:train:First accuracy: 0.925, f1: 0.630, prec: 0.649, rec: 0.611
+
+
+
+Final Results
+
+All Labels
+
+Baseline
+INFO:train:Train loss: 11.762, accuracy: 0.986, f1: 0.941, prec: 0.945, rec: 0.938
+INFO:train:Validation loss: 25.983, accuracy: 0.968, f1: 0.852, prec: 0.853, rec: 0.850
+INFO:train:First accuracy: 0.968, f1: 0.852, prec: 0.853, rec: 0.850
+
+VAT
+INFO:train:Train loss: 14.839, accuracy: 0.988, f1: 0.951, prec: 0.957, rec: 0.946
+INFO:train:Validation loss: 21.556, accuracy: 0.972, f1: 0.866, prec: 0.879, rec: 0.854
+INFO:train:First accuracy: 0.972, f1: 0.866, prec: 0.879, rec: 0.854
+
+MT

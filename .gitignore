@@ -1,5 +1,6 @@
 __MACOSX
 .DS_Store
 *.pyc
+*.zip
 data
 train.log
