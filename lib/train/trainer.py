@@ -79,7 +79,6 @@ class Trainer(object):
     def get_lds(self, batch, unlabeled_batch):
         lds = self.vat_loss(self.model, batch)
         if unlabeled_batch is not None and not self.opt.no_unlabeled:
-            print("here")
             lds += self.vat_loss(self.model, unlabeled_batch)
             return lds / (self.opt.n_ubatches + 1.)
         else:
